@@ -3,11 +3,13 @@
 #include<vector>
 #include<algorithm>
 #include <sstream>  
+#include<iomanip>
 using namespace std;
 
 vector<string> sss;
 int main()
 {      
+
 //        sss.push_back("111");
 //        sss.push_back("222");
 //        sss.push_back("333");
@@ -31,8 +33,8 @@ int main()
 // int i = 000000000071;
 // int j = 0x00000A;
 // int k = 111;
-double i= 5.10101E ;
-double j=1.e3;
+string str="123456";
+int i=4;
 // string sti = "0000000071.4";
 // stringstream stream;
 // //stream<<hexfloat<<sti;
@@ -40,5 +42,9 @@ double j=1.e3;
 // stream>>i;
 // j=strtoul(sti.c_str(),nullptr,8);
 
-cout<<i<<endl<<j<<endl;
+
+// cout<<str<<endl;
+//12312321321321
+cout<<i<<endl<<int(str.length())<<endl;
+cout<<i-int(str.length())<<endl;
 }

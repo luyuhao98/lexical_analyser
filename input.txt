@@ -1,4 +1,46 @@
-test tab    enter
-ok en123 enter
-chinese 中文
-miao
+void intable(tables t)
+{
+        vector<string> *table = nullptr;
+        string outstr;
+        switch (t)
+        {
+        case ID:
+                table = &symbol_talbe;
+                outstr = "ID, ";
+                break;
+        case NUM:
+                table = &num_talbe;
+                outstr = "NUM, ";
+                break;
+        case STR:
+                table = &string_table;
+                outstr = "STR, ";
+                break;
+        default:
+                cout << "intable error";
+                exit(0);
+        }
+        int id;
+        vector<string>::iterator walker = find(table->begin(), table->end(), str);
+        id = walker - table->begin();
+        if (walker == table->end())
+        {
+                table->push_back(str);
+        }
+        o << outstr << id << endl;
+        str.clear();
+}
+
+/*int main()
+{
+ad 123a
+0x12399
+0x123.acb
+0x123.acbp99
+0x123.acbpae
+0123
+0123.234
+123.E-1123
+        cout<<1234<<setw(4)<<5678<<endl;
+        cout<<12345<<setw(4)<<67890<<endl;
+}*/

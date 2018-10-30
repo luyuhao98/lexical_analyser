@@ -1,0 +1,199 @@
+void,29
+ID, 0
+(,-
+ID, 1
+ID, 2
+),-
+{,-
+ID, 3
+<,-
+ID, 4
+>,-
+*,-
+ID, 5
+=,-
+ID, 6
+;,-
+ID, 4
+ID, 7
+;,-
+switch,25
+(,-
+ID, 2
+),-
+{,-
+ID, 8
+ID, 9
+:,-
+ID, 5
+=,-
+&,-
+ID, 10
+;,-
+ID, 7
+=,-
+STR, 0
+;,-
+break,1
+;,-
+ID, 8
+ID, 11
+:,-
+ID, 5
+=,-
+&,-
+ID, 12
+;,-
+ID, 7
+=,-
+STR, 1
+;,-
+break,1
+;,-
+ID, 8
+ID, 13
+:,-
+ID, 5
+=,-
+&,-
+ID, 14
+;,-
+ID, 7
+=,-
+STR, 2
+;,-
+break,1
+;,-
+default,6
+:,-
+ID, 15
+<<,-
+STR, 3
+;,-
+ID, 16
+(,-
+NUM, 0
+),-
+;,-
+},-
+int,16
+ID, 17
+;,-
+ID, 3
+<,-
+ID, 4
+>,-
+::,-
+ID, 18
+ID, 19
+=,-
+ID, 20
+(,-
+ID, 5
+->,-
+ID, 21
+(,-
+),-
+,,-
+ID, 5
+->,-
+ID, 22
+(,-
+),-
+,,-
+ID, 23
+),-
+;,-
+ID, 17
+=,-
+ID, 19
+-,-
+ID, 5
+->,-
+ID, 21
+(,-
+),-
+;,-
+if,15
+(,-
+ID, 19
+==,-
+ID, 5
+->,-
+ID, 22
+(,-
+),-
+),-
+{,-
+ID, 5
+->,-
+ID, 24
+(,-
+ID, 23
+),-
+;,-
+},-
+ID, 25
+<<,-
+ID, 7
+<<,-
+ID, 17
+<<,-
+ID, 26
+;,-
+ID, 23
+.,-
+ID, 27
+(,-
+),-
+;,-
+},-
+Comment:int main()
+{
+ad 123a
+0x12399
+0x123.acb
+0x123.acbp99
+0x123.acbpae
+0123
+0123.234
+123.E-1123
+        cout<<1234<<setw(4)<<5678<<endl;
+        cout<<12345<<setw(4)<<67890<<endl;
+}
+ID TABLE:
+0	intable
+1	tables
+2	t
+3	vector
+4	string
+5	table
+6	nullptr
+7	outstr
+8	case
+9	ID
+10	symbol_talbe
+11	NUM
+12	num_talbe
+13	STR
+14	string_table
+15	cout
+16	exit
+17	id
+18	iterator
+19	walker
+20	find
+21	begin
+22	end
+23	str
+24	push_back
+25	o
+26	endl
+27	clear
+NUM TABLE: 
+0	0
+STR TABLE 
+0	ID, 
+1	NUM, 
+2	STR, 
+3	intable error

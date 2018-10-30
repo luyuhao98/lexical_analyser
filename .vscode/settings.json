@@ -1,5 +1,10 @@
 {
         "files.associations": {
-                "streambuf": "cpp"
+                "streambuf": "cpp",
+                "*.tcc": "cpp",
+                "iomanip": "cpp",
+                "ostream": "cpp",
+                "string_view": "cpp",
+                "system_error": "cpp"
         }
 }
