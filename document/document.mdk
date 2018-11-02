@@ -1,18 +1,59 @@
-Title         : Welcome
-Author        : You
+Title         : C语言词法分析器
+Author        : 卢昱昊
 Logo          : True
 
 [TITLE]
+[TOC]
 
-# Madoko 
+#Ｃ语言词法分析规范
+## 语言说明
 
-Madoko is a fast markdown processor for writing professional articles
-with a focus on simplicity and plain text readability.
+保留字
+ ~genju
+~ 标示符
+* 运算符
+* 
+* 
 
-* Read the [reference manual].
-* Explore the upper-right toolbox menu to discover how Markdown works. 
-* `Alt-Q` reformats the current paragraph.
+#词法分析器实现功能
+## 实验需求
+## 完成需求
 
-Enjoy!
+#具体实现
+## 状态转移图
+## 全局变量与函数
+## 代码
+
+#测试
+## 输入
+## 输出
+
+digraph finite_state_machine {
+    rankdir = LR;
+    size = "8,5"
+     
+    node [shape = doublecircle]; 
+     
+    LR_0 LR_3 LR_4 LR_8;
+     
+   node [shape = circle];
+    
+   LR_0 -> LR_2 [ label = "SS(B)" ];
+   LR_0 -> LR_1 [ label = "SS(S)" ];
+   LR_1 -> LR_3 [ label = "S($end)" ];
+   LR_2 -> LR_6 [ label = "SS(b)" ];
+   LR_2 -> LR_5 [ label = "SS(a)" ];
+   LR_2 -> LR_4 [ label = "S(A)" ];
+   LR_5 -> LR_7 [ label = "S(b)" ];
+   LR_5 -> LR_5 [ label = "S(a)" ];
+   LR_6 -> LR_6 [ label = "S(b)" ];
+   LR_6 -> LR_5 [ label = "S(a)" ];
+   LR_7 -> LR_8 [ label = "S(b)" ];
+   LR_7 -> LR_5 [ label = "S(a)" ];
+   LR_8 -> LR_6 [ label = "S(b)" ];
+   LR_8 -> LR_5 [ label = "S(a)" ];
+}
 
 [reference manual]: http://research.microsoft.com/en-us/um/people/daan/madoko/doc/reference.html  "Madoko reference manual"
+
+package : dot2tex
