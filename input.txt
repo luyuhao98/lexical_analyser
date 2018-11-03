@@ -1,37 +1,8 @@
-void intable(tables t)
-{
-        vector<string> *table = nullptr;
-        string outstr;
-        switch (t)
-        {
-        case ID:
-                table = &symbol_talbe;
-                outstr = "ID, ";
-                break;
-        case NUM:
-                table = &num_talbe;
-                outstr = "NUM, ";
-                break;
-        case STR:
-                table = &string_table;
-                outstr = "STR, ";
-                break;
-        default:
-                cout << "intable error";
-                exit(0);
-        }
-        int id;
-        vector<string>::iterator walker = find(table->begin(), table->end(), str);
-        id = walker - table->begin();
-        if (walker == table->end())
-        {
-                table->push_back(str);
-        }
-        o << outstr << id << endl;
-        str.clear();
-}
-
-/*int main()
+'\\'
+char '\a'
+char '\?'
+char '\f'
+int main()
 {
 ad 123a
 0x12399
@@ -43,4 +14,4 @@ ad 123a
 123.E-1123
         cout<<1234<<setw(4)<<5678<<endl;
         cout<<12345<<setw(4)<<67890<<endl;
-}*/
+}

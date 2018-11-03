@@ -1,6 +1,7 @@
 Title         : C语言词法分析器
 Author        : 卢昱昊
 Logo          : True
+Package : [UTF8]ctex
 
 [TITLE]
 [TOC]
@@ -8,26 +9,126 @@ Logo          : True
 #Ｃ语言词法分析规范
 ## 语言说明
 
-保留字
- ~genju
-~ 标示符
-* 运算符
-* 
-* 
+### 保留字
+ANSI C中规定了C语言的保留字有32个，分别是:
+```
+auto break case char const continue defaultdo double else 
+enum extern float forgoto if int long register return 
+short signed static sizeof struct switch typedef union
+unsigned void volatile while auto
+```
+
+### 标示符
+
+此处标示符特指**用户自定义标示符**。C语言对标示符有以下规定:
+
+1. 标识符由字母（A-Z,a-z）、数字（0-9）、下划线“_”组成，首字符不能是数字，但可以是字母或者下划线。
+2. 不能把C语言保留字作为标识符，例如if ,for, while等.
+3. 标识符对大小写敏感
+
+### 运算符
+运算符是一种告诉编译器执行特定的数学或逻辑操作的符号。C提供了以下类型的运算符：
+* 算术运算符: `+ - * / % ++ --`
+* 关系运算符: `== != > < >= <=`
+* 逻辑运算符: `&& || !`
+* 位运算符: `& | ^ ~ << >>`
+* 赋值运算符: `= += -= *= %= <<= &= ^= !=`
+* 杂项运算符: `& * ?:`
+*此外词法分析器也将**界符**视为运算符*:`{ } [ ] < > " ' , ; `
+
+### 常量 { #num } 
+词法分析阶段，常量仅仅分为数字与字符串
+
+数字：
+ ~
+1. 十进制整数，如：`0,123`
+2. 十进制浮点数，如： `.1, 0., 1.234` 
+3. 十进制指数，如： `12E-19, .33E10`
+4. 八进制整数， 如：`073 0000012`
+  (_根据C99，不支持八进制浮点及指数，若有均视为十进制_)
+5. 十六进制整数，`0xA, 0x2Ef,`
+6. 十六进制浮点数，`0x.3p-9, 0xF.p100`\n
+    (_根据C99，十六进制浮点数必须带指数, 且指数符号为p(P)_)
+
+字符串（及字符）:
+ ~
+1. 转义字符:`\a \b \f \n \r \t \v \\ \' \? \0`
+2. 字符支持十六进制表示ascii码`\xhh`
+3. 字符串中间不允许换行。
+
+### 注释符
+注释分为两种
+
+1. 单行注释：`//`
+2. 多行注释： `/*....*/`
 
 #词法分析器实现功能
 ## 实验需求
-## 完成需求
+设计并实现C语言的词法分析程序
+
+1. 可以识别出用c语言编写的源程序中的每个单词符号，并以记号的形式输出每个单词符号。
+2. 可以识别并跳过源程序中的注释
+3. 可以统计源程序中的语句行数、各类单词的个数、以及字符总数，并输出统计结果
+4. 检查源程序中存在的词法错误，并报告错误所在的位置
+5. 对源程序中出现的错误进行适当的恢复，使词法分析可以继续进行，对源程序进行一次扫描，即可检查并报告源程序中存在的所有词法错误。
+
+## 完成与改进
+完全满足了实验需求，并做出了一些改进：
+
+1. 除字符串中八进制转义字符形式外，支持C99所有的词法分析。
+2. 可识别保留字，并输出 `<保留字>,<保留字index>`.(32个保留字存于const string数组中)
+3. 可识别标示符，存入记号表，并输出: `ID，<ID表中index>`
+4. 可识别数字，支持 前文[#num]中所有数字部分。__此部分是本词法分析的主要优点之一，投入了作者较多兴趣与精力，所有情况均经过gcc 7.3.0验证__。识别出的数字存入数字表，输出: `NUM,<NUM表中index>`
+5. 可识别字符与字符串，支持转字符的识别，并且字符支持十六进制ascii转义；字符串中换行可报错。存入字符串表，输出：`STR，<STR表index>`
+6. 可以识别并跳过源程序中的注释。**(此处为了演示效果，将以`Coment:<注释内容>`)输出**
+7. 可以识别运算符界符，直接输出: `<符号>，_`
+7. 可以统计源程序中的语句行数，以及标示符个数，数字个数以及字符串个数。
+8. 检查源程序中存在的词法错误，并报告错误位置,**精确到行列**。输出格式：`<row_index>,<column_index> ERROR: <error原因>:	<报错字符串>`
+9. 发现错误后跳过整行，使词法分析器可以继续进行，对源程序进行一次扫描，即可检查并报告源程序中存在的所有错误。
+10. 跳过空格与制表符，此外，对于回车换行符，兼容`Win: \r\n`，`Mac: \r`，`Linux: \n`;
+
 
 #具体实现
-## 状态转移图
 ## 全局变量与函数
-## 代码
-
-#测试
-## 输入
-## 输出
-
+reserves
+ ~string数组，保存保留字
+input
+ ~string，读入缓冲区
+in
+ ~char，当前检测字符
+i_input
+ ~long long，当前检测字符的index
+str
+ ~string 存放当前正在识别的单词串
+row
+ ~int,行号，当前光标所在行数
+column 
+ ~int,列号
+symbol_table
+ ~vector<string> 符号表
+num_table
+ ~vector<string> 数字表
+string_table
+ ~vector<string> 字符串表
+goforward()
+ ~bool, 若超出缓冲区返回false；反之指针前移，push_back识别串str，列号加一，返回true
+goback()
+ ~void, 指针后退,执行与goforward反操作。
+isreserved()
+ ~int, 判断是否为保留字，若是返回reserves中的index，否则返回-1
+tables
+ ~enum, 枚举类型：ID，NUM，STR，方便表操作
+intable(tables)
+ ~void，根据tables 类型(ID，NUM，STR)，存入相应的表中
+outtable(tables)
+ ~void，根据tables类型，输出
+outerror(error)
+ ~void, error为常字符串。输出错误位置以及原因，并进行处理(跳过此行)以继续检测
+outopt()
+ ~void, 输出操作符
+state
+ ~int, 代表当前状态
+## 状态转移图
 digraph finite_state_machine {
     rankdir = LR;
     size = "8,5"
@@ -54,6 +155,734 @@ digraph finite_state_machine {
    LR_8 -> LR_5 [ label = "S(a)" ];
 }
 
-[reference manual]: http://research.microsoft.com/en-us/um/people/daan/madoko/doc/reference.html  "Madoko reference manual"
+## 代码
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <fstream>
+#include <streambuf>
+#include <typeinfo>
+#include <iomanip>
 
-package : dot2tex
+using namespace std;
+/*保留字*/
+const string reserves[32] = {"auto", "break", "ase", "char", "const", "continue", "default",
+                       "do", "double", "else", "enum", "extern", "float", "for", "goto", "if", "int",
+                       "long", "register", "return", "short", "signed", "sizeof", "static", "struct",
+                       "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
+/*输入区*/
+ifstream t("input.txt");
+string input((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+/*标志位*/
+long long i_input = -1;
+/*存放临时字符串*/
+string str = "";
+/*读头字符in*/
+char in = input[i_input];
+/*行号*/
+int row = 1, column = 0;
+
+/*输出区*/
+ofstream o("output.txt");
+
+/*符号表*/
+vector<string> symbol_talbe;
+/*常数表*/
+vector<string> num_talbe;
+/*字符串表*/
+vector<string> string_table;
+
+/*----------------函数区-------------*/
+bool goforward()
+{
+
+        if (++i_input < input.length())
+        {
+                in = input[i_input];
+                column++;
+                str.push_back(in);
+                return true;
+        }
+        return false;
+}
+
+void goback()
+{
+        in = input[--i_input];
+        str.pop_back();
+        column--;
+}
+
+int isreserved()
+{
+        for (int i = 0; i < 32; i++)
+        {
+                if (!str.compare(reserves[i]))
+                        return i;
+        }
+        return -1;
+}
+enum tables
+{
+        ID,
+        NUM,
+        STR
+};
+/*返回表内id，若无此变量，则压入*/
+void intable(tables t)
+{
+        vector<string> *table = nullptr;
+        string outstr;
+        switch (t)
+        {
+        case ID:
+                table = &symbol_talbe;
+                outstr = "ID, ";
+                break;
+        case NUM:
+                table = &num_talbe;
+                outstr = "NUM, ";
+                break;
+        case STR:
+                table = &string_table;
+                outstr = "STR, ";
+                break;
+        default:
+                cout << "intable error";
+                exit(0);
+        }
+        int id;
+        vector<string>::iterator walker = find(table->begin(), table->end(), str);
+        id = walker - table->begin();
+        if (walker == table->end())
+        {
+                table->push_back(str);
+        }
+        o << outstr << id << endl;
+        str.clear();
+}
+void outtable(tables t)
+{
+        vector<string> *table = nullptr;
+        string outstr;
+        switch (t)
+        {
+        case ID:
+                table = &symbol_talbe;
+                outstr = "ID TABLE: ";
+                break;
+        case NUM:
+                table = &num_talbe;
+                outstr = "NUM TABLE: ";
+                break;
+        case STR:
+                table = &string_table;
+                outstr = "STR TABLE: ";
+                break;
+        default:
+                outstr = "outtable error";
+                exit(0);
+        }
+        o << outstr <<table->size() <<endl;
+        vector<string>::iterator walker = table->begin();
+        for (; walker < table->end(); walker++)
+        {       
+                o << walker - table->begin()<<'\t'<< *walker  << endl;
+        }
+}
+
+void outerror(const char *error)
+{
+        o << row << "," << column - str.length()+1 << " ERROR  :" << error << ":\t" << str<<endl;
+        while (!(in == '\r' || in == '\n') && goforward());
+        goback();
+        str.clear();
+}
+
+void outopt()
+{
+        o << str << ",-" << endl;
+        str.clear();
+}
+/*-------------------------------------------*/
+
+int main()
+{
+        input.push_back('\n');
+        int state = 0; //默认状态为0
+        while (goforward())
+        {
+
+                switch (state)
+                {
+                case 0: //默认状态
+                        if ((in >= 'A' && in <= 'Z') || (in >= 'a' && in <= 'z') || (in == '_'))
+                        {                  //大小写字母下划线开头
+                                state = 1; //标示符
+                        }
+                        else if (in == '0')
+                        { //八进制2 十六进制3
+                                state = 2;
+                        }
+                        else if (in >= '1' && in <= '9')
+                        { //十进制4
+                                state = 11;
+                        }
+                        else
+                        { //其他特殊符号
+                                switch (in)
+                                {
+                                case '.':
+                                        state = 16;
+                                        break;
+                                case '+':
+                                case '&':
+                                case '|':
+                                        if (goforward() && !(in == str[0] || in == '='))
+                                        {
+                                                goback();
+                                        }
+                                        outopt();
+                                        break;
+                                case '-':
+                                        if (goforward() && !(in == '-' || in == '=' || in == '>'))
+                                        {
+                                                goback();
+                                        }
+                                        outopt();
+                                        break;
+                                case '*':
+                                case '%':
+                                case '=':
+                                case '!':
+                                case '^':
+                                        if (goforward() && !(in == '='))
+                                        {
+                                                goback();
+                                        }
+                                        outopt();
+                                        break;
+                                case '/':
+                                        if (goforward())
+                                        {
+                                                if (in == '=')
+                                                        outopt();
+                                                else if (in == '/')
+                                                {
+                                                        str.clear();
+                                                        state = 17;
+                                                }
+
+                                                else if (in == '*')
+                                                {
+                                                        str.clear();
+                                                        /*???*/ state = 18;
+                                                }
+                                        }
+                                        break;
+                                case '~':
+                                case '?':
+                                case ',':
+                                case ';':
+                                case '(':
+                                case ')':
+                                case '[':
+                                case ']':
+                                case '{':
+                                case '}':
+                                        outopt();
+                                        break;
+                                case ' ':
+                                case '\t':
+                                        str.clear();
+                                        break;
+                                case '\r':
+                                        if (goforward() && in != '\n')
+                                        {
+                                                goback(); //win系统\r\n换行 ，mac\r换行
+                                        }
+                                        row++;
+                                        column = -1;
+                                        str.clear();
+                                        break;
+                                case '\n': // linux系统 \n换行
+                                        row++;
+                                        column = -1;
+                                        str.clear();
+                                        break;
+                                case ':':
+                                        if (goforward() && !(in == ':'))
+                                        {
+                                                goback();
+                                        }
+                                        outopt();
+                                        break;
+                                case '>':
+                                case '<':
+                                        state = 20;
+                                        break;
+                                case '\'':
+                                        state = 22;
+                                        str.pop_back();//删掉‘
+                                        break;
+                                case '\"':
+                                        state = 27;
+                                        str.pop_back();//删掉“
+                                        break;
+                                default:
+                                        outerror("stray in program");
+                                        state =0;
+                                }
+                        }
+                        break;
+
+                case 1: //符号状态
+                        if ((in >= 'A' && in <= 'Z') || (in >= 'a' && in <= 'z') || (in >= '0' && in <= '9') || in == '_')
+                        {
+                                state = 1;
+                        }
+                        else
+                        {
+                                goback();
+                                int flag = isreserved();
+                                if (flag != -1){ //保留字>=0
+                                        o << str << ',' << flag << endl;
+                                        str.clear();
+                                }
+                                else
+                                {
+                                        
+                                        intable(ID);
+                                }
+                                state = 0;
+                        }
+                        break;
+                case 2: //0  八进制 or 十六进制
+                        if (in == 'x' || in == 'X')
+                        {
+                                state = 3; //十六进制 十六进制浮点数必须带指数p (g++)
+                        }
+                        else if (in >= '0' && in <= '7')
+                        {
+                                state = 10; //八进制 八进制无浮点数，带浮点视为十进制 (g++)
+                        }
+                        else if (in =='.')
+                        {
+                                state = 12;
+                        }
+                        /*此外，只要加'.' 无论后面是否跟数字or指数都视为浮点数。如0xA. 报错：十六进制浮点数必须带指数*/
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 3: //0x
+                        if ((in >= '0' && in <= '9') || (in >= 'A' && in <= 'F') || (in >= 'a' && in <= 'f'))
+                        {
+                                state = 4; //0xA
+                        }
+                        else if (in = '.')
+                        {
+                                state = 5; //0x.
+                        }
+                        else
+                        {
+                                outerror("invalid num");
+                                state = 0;
+                        }
+                        break;
+
+                case 4: //0xA
+                        if ((in >= '0' && in <= '9') || (in >= 'A' && in <= 'F') || (in >= 'a' && in <= 'f'))
+                        {
+                                state = 4; //0xABC123
+                        }
+                        else if (in == '.')
+                        {
+                                state = 6; //0xABC123.
+                        }
+                        else if(in == 'p'|| in =='P'){
+                                state = 7; //0xAbcp
+                        }
+                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 5: //0x.
+                        if ((in >= '0' && in <= '9') || (in >= 'A' && in <= 'F') || (in >= 'a' && in <= 'f'))
+                        {
+                                state = 6; //0x.B
+                        }
+                        else if((in >='g'&&in<='z'&&in!='p')||(in>='G'&&in<='Z'&&in!='P')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                outerror("no digits in hexadecimal floating constant");
+                                state = 0;
+                        }
+                        break;
+                case 6: //0xA. or 0x.B
+                        if ((in >= '0' && in <= '9') || (in >= 'A' && in <= 'F') || (in >= 'a' && in <= 'f'))
+                        {
+                                state = 6; //0xA2.F23
+                        }
+                        else if (in == 'p' || in == 'P')
+                        {
+                                state = 7; //0xA2.F23p
+                        }
+                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        
+                        else
+                        {
+                                outerror("hexadecimal floating constants require an exponent");
+                                state = 0;
+                        }
+                        break;
+                case 7: //0xA2.23p or 0x.bc12p or 0xABCp
+                        if (in >= '0' && in <= '9')
+                        {                  //p后只支持十进制
+                                state = 8; //0xA2.23p1
+                        }
+                        else if (in == '-' || in == '+')
+                        {
+                                state = 9; //0xA2.23p-
+                        }
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                outerror("exponent has no digits");
+                                state = 0;
+                        }
+                        break;
+                case 8: //0xA2.23p1 or //0xA2.23p-1
+                        if (in >= '0' && in <= '9')
+                        {
+                                state = 8; //0xA2.23p123 or //0xA2.23p-123
+                        }
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 9: //0xA2.23p-
+                        if (in >= '0' && in <= '9')
+                        {
+                                state = 8; //0xA2.23p-1
+                        }
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        
+                        else
+                        {
+                                outerror("exponent has no digits");
+                                state = 0;
+                        }
+                        break;
+                case 10: //八进制
+                        if (in >= '0' && in <= '7')
+                        {
+                                state = 10;
+                        }
+                        else if (in == '.')
+                        {
+                                state = 12; //八进制 八进制无浮点数，带浮点视为十进制 (g++)
+                        }
+                        else if (in == 'e' || in == 'E')
+                                state = 13; //八进制 八进制无指数，带浮点视为十进制 (g++)
+                        else if (in >='8' && in <='9')
+                        {       
+                                outerror("invalid digit in octal constant");
+                                state = 0;
+                        }   
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 11: //1
+                        if (in >= '0' && in <= '9')
+                                state = 11; //1234
+                        else if (in == '.')
+                                state = 12; //1234.
+                        else if (in == 'e'|| in == 'E')
+                                state = 13;////123e
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 12: //123.   0.
+                        if (in >= '0' && in <= '9')
+                                state = 12; //123.456
+                        else if (in == 'e' || in == 'E')
+                                state = 13; //123.456e
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 13: //123.456e or 123e
+                        if (in >= '0' && in <= '9')
+                                state = 14; //123.456e7
+                        else if (in == '-' || in == '+')
+                                state = 15; //123.456e-
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                outerror("exponent has no digits");
+                                state = 0;
+                        }
+                        break;
+                case 14: //123.456e7 or 123.456e-7
+                        if (in >= '0' && in <= '9')
+                                state = 14; //123.456e789 or 123.456e-789
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                goback();
+                                intable(NUM);
+                                state = 0;
+                        }
+                        break;
+                case 15: //123.456e-
+                        if (in >= '0' && in <= '9')
+                                state = 14; //123.456e-7
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        else
+                        {
+                                outerror("exponent has no digits");
+                                state = 0;
+                        }
+                        break;
+                case 16: //.
+                        if (in >= '0' && in <= '9')
+                                state = 12; //小数模式
+                        else
+                        {
+                                goback();
+                                outopt();
+                                state = 0;
+                        }
+                        break;
+                case 17: // //
+                        if (in == '\r' || in == '\n')
+                        {
+                                goback();
+                                o << "Comment:" << str<<endl;;
+                                str.clear();
+                                state = 0;
+                        }
+                        break;
+                case 18: // /*
+                        if (in == '*')
+                                state = 19;
+                        break;
+                case 19: // /*balabala*
+                        if (in == '/')
+                        {
+                                str.pop_back();
+                                str.pop_back(); // 弹出*/ 同前面弹出/*
+                                o << "Comment:" << str<<endl;
+                                str.clear();
+                                state = 0;
+                        }
+                        else
+                                state = 18;
+                        break;
+                case 20: // > <
+                        if (in == '=')
+                        {
+                                outopt();
+                                state = 0;
+                        }
+                        else if (in == str[0])
+                        {
+                                state = 21;
+                        }
+                        else
+                        {
+                                goback();
+                                outopt();
+                                state = 0;
+                        }
+                        break;
+                case 21: // <<
+                        if (in != '=')
+                                goback(); //<<3
+                        outopt();
+                        state = 0;
+                        break;
+                case 22: // char 模式 '（已经删掉） str="{in}"
+                        if (in == '\\')
+                                /* \ */
+                                state = 23;
+                        else {
+                                state = 24; // a
+                        } 
+                        break;
+                case 23:// 'mode: \ //
+                        char tra;
+                        switch(in){// 'mode \a //
+                                case 'a' : tra='\a';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 'b' : tra='\b';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 'f' : tra='\f';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 'n' : tra='\n';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 'r' : tra='\r';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 't' : tra='\t';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case 'v' : tra='\v';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case '\\': tra='\\';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case '\'' : tra='\'';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case '\"' : tra='\"';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                case '\?' : tra='\?';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
+                                                
+                                case 'x':// \x
+                                        state = 25;
+                                default:
+                                        outerror("illegal char!");
+                                        state =0;
+                        }
+                        break;
+                case 24:// 'over mode : a{in}
+                        if (in == '\'')// a' \'回单引号
+                        {
+                                str.pop_back();// a
+                                intable(STR);
+                                
+                        }
+                        else {//ab
+                                outerror("illegal char!");
+                        }
+                        state = 0;
+                        break;
+                case 25:// \x{in}
+                        if((in>='0'&&in<='9')||(in>='a'&&in<='f')||(in>='A'&&in<='F'))
+                                state =26;
+                        else {
+                                outerror("illegal char!");
+                                state =0;
+                        }
+                        break;
+                case 26: // \xa{in}
+                        if((in>='0'&&in<='9')||(in>='a'&&in<='f')||(in>='A'&&in<='F')){
+                        // \xaf
+                                state = 24;   
+                        }
+                        else if(in =='\''){
+                        // \xa'  
+                                str.pop_back(); // \xa
+                                intable(STR);
+                        }
+                        else {
+                                outerror("illegal char!");
+                                state =0;
+                        }
+                        break;
+                case 27: // string mode "(被删掉) str="{in}"
+                        if (in == '\\')//str = "asdasdasd\"
+                                state = 28;
+                        else if (in == '\"')//str = "ababababa""
+                                {
+                                        str.pop_back();
+                                        intable(STR);
+                                        state = 0;
+                                }
+                        else if (in == '\r'|| in == '\n'){
+                                goback();
+                                outerror("missing terminating \" character");
+                                state = 0;
+                        }
+                        else state =27;
+                        break;
+                case 28:// asfasdfasdf\{in}
+                        char traa;
+                        switch(in){
+                                case 'a' : traa='\a';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 'b' : traa='\b';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 'f' : traa='\f';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 'n' : traa='\n';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 'r' : traa='\r';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 't' : traa='\t';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case 'v' : traa='\v';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case '\\': traa='\\';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case '\'' : traa='\'';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case '\"' : traa='\"';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                case '\?' : traa='\?';str.pop_back();str.pop_back();str.push_back(traa);state =27;break;
+                                default:
+                                        outerror("illegal char!");
+                                        state =0;
+                        }
+                        break;
+
+                }
+        }
+        if (!str.empty())
+        {
+                o << row << ":" << "illegal end!" << endl;
+        }
+        row--;//平衡开始增添的\n
+        outtable(ID);
+        outtable(NUM);
+        outtable(STR);
+        o << "Num of rows:  " << row << endl;
+        
+}
+
+```
+
+#测试
+## 输入
+## 输出

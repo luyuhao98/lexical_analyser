@@ -1,5 +1,5 @@
-#include<iostream>
 #include<string>
+#include<iostream>
 #include<vector>
 #include<algorithm>
 #include <sstream>  
@@ -33,8 +33,8 @@ int main()
 // int i = 000000000071;
 // int j = 0x00000A;
 // int k = 111;
-string str="123456";
-int i=4;
+
+float i =0x4.p5;
 // string sti = "0000000071.4";
 // stringstream stream;
 // //stream<<hexfloat<<sti;
@@ -42,9 +42,8 @@ int i=4;
 // stream>>i;
 // j=strtoul(sti.c_str(),nullptr,8);
 
-
+qqqq
 // cout<<str<<endl;
 //12312321321321
-cout<<i<<endl<<int(str.length())<<endl;
-cout<<i-int(str.length())<<endl;
+cout<<i<<endl;
 }

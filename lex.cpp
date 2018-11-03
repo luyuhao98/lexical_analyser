@@ -9,7 +9,7 @@
 
 using namespace std;
 /*保留字*/
-string reserves[32] = {"auto", "break", "ase", "char", "const", "continue", "default",
+const string reserves[32] = {"auto", "break", "ase", "char", "const", "continue", "default",
                        "do", "double", "else", "enum", "extern", "float", "for", "goto", "if", "int",
                        "long", "register", "return", "short", "signed", "sizeof", "static", "struct",
                        "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
@@ -17,15 +17,13 @@ string reserves[32] = {"auto", "break", "ase", "char", "const", "continue", "def
 ifstream t("input.txt");
 string input((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 /*标志位*/
-int i_input = -1;
+long long i_input = -1;
 /*存放临时字符串*/
 string str = "";
 /*读头字符in*/
 char in = input[i_input];
 /*行号*/
 int row = 1, column = 0;
-/*行数*/
-int num_row = 0;
 
 /*输出区*/
 ofstream o("output.txt");
@@ -114,7 +112,7 @@ void outtable(tables t)
         {
         case ID:
                 table = &symbol_talbe;
-                outstr = "ID TABLE:";
+                outstr = "ID TABLE: ";
                 break;
         case NUM:
                 table = &num_talbe;
@@ -122,13 +120,13 @@ void outtable(tables t)
                 break;
         case STR:
                 table = &string_table;
-                outstr = "STR TABLE ";
+                outstr = "STR TABLE: ";
                 break;
         default:
                 outstr = "outtable error";
                 exit(0);
         }
-        o << outstr << endl;
+        o << outstr <<table->size() <<endl;
         vector<string>::iterator walker = table->begin();
         for (; walker < table->end(); walker++)
         {       
@@ -138,7 +136,7 @@ void outtable(tables t)
 
 void outerror(const char *error)
 {
-        o << row << "," << column - str.length()+1 << ":" << error << ":" << str<<endl;
+        o << row << "," << column - str.length()+1 << " ERROR  :" << error << ":\t" << str<<endl;
         while (!(in == '\r' || in == '\n') && goforward());
         goback();
         str.clear();
@@ -457,11 +455,13 @@ int main()
                         {
                                 state = 12; //八进制 八进制无浮点数，带浮点视为十进制 (g++)
                         }
+                        else if (in == 'e' || in == 'E')
+                                state = 13; //八进制 八进制无指数，带浮点视为十进制 (g++)
                         else if (in >='8' && in <='9')
                         {       
                                 outerror("invalid digit in octal constant");
                                 state = 0;
-                        }
+                        }   
                         else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
@@ -608,7 +608,7 @@ int main()
                         state = 0;
                         break;
                 case 22: // char 模式 '（已经删掉） str="{in}"
-                        if (in != '\\')
+                        if (in == '\\')
                                 /* \ */
                                 state = 23;
                         else {
@@ -648,6 +648,7 @@ int main()
                                 outerror("illegal char!");
                         }
                         state = 0;
+                        break;
                 case 25:// \x{in}
                         if((in>='0'&&in<='9')||(in>='a'&&in<='f')||(in>='A'&&in<='F'))
                                 state =26;
@@ -717,6 +718,6 @@ int main()
         outtable(ID);
         outtable(NUM);
         outtable(STR);
-        cout << "Num of rows:  " << row << endl;
+        o << "Num of rows:  " << row << endl;
         
 }
