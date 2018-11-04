@@ -26,12 +26,12 @@ document　　　　　　　　　　　　　\
 2. 运行可执行文件　lex/lex.exe
 3. 观察output.txt
 
-# 修改文档　(前提是拥有madoko环境)
+# 修改文档　(需要madoko环境)
 1. 编辑`document/document.mdk `
 2. 回到主目录运行 `madoko -v document/document.mdk`
 3. 观察`out/document.html`
 
-# 修改状态图　(前提是配置好graphviz环境)
+# 修改状态图　(需要graphviz环境)
 1. 编辑`document/states.dot`
 2. 直接在`document`目录下运行 `dot -Tsvg states.dot -o state.svg`
 3. 观察`state.svg`
