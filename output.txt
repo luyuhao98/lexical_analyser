@@ -1,72 +1,211 @@
-STR, 0
-char,3
-STR, 1
-char,3
-STR, 2
-char,3
-STR, 3
 int,16
 ID, 0
 (,-
 ),-
 {,-
+double,8
+3,15 ERROR  :expected unqualified-id before numeric constant:	0_
+Comment:  非法符号0_p,
+        报错且跳过balabala进入下一行  
+double,8
 ID, 1
-7,3 ERROR  :expected unqualified-id before numeric constant:	123a
+=,-
 NUM, 0
-9,0 ERROR  :hexadecimal floating constants require an exponent:	0x123.acb
-
-NUM, 1
-11,0 ERROR  :expected unqualified-id before numeric constant:	0x123.acbpa
-NUM, 2
-NUM, 3
-NUM, 4
-ID, 2
-<<,-
-NUM, 5
-<<,-
-ID, 3
-(,-
-NUM, 6
-),-
-<<,-
-NUM, 7
-<<,-
-ID, 4
 ;,-
+Comment:符号+正确的十六进制浮点数
+Comment:保留字 + 正确的十六进制浮点数 
+auto,0
 ID, 2
-<<,-
-NUM, 8
-<<,-
+=,-
+NUM, 1
+;,-
+Comment:非法数字
+double,8
 ID, 3
-(,-
-NUM, 6
-),-
-<<,-
-NUM, 9
-<<,-
+=,-
+11,19 ERROR  :no digits in hexadecimal floating constant:	0x; 
+Comment:缺位的十六进制浮点数
+double,8
 ID, 4
+=,-
+13,19 ERROR  :no digits in hexadecimal floating constant:	0x.;
+Comment:十六进制浮点数缺少指数
+double,8
+ID, 5
+=,-
+15,19 ERROR  :hexadecimal floating constants require an exponent:	0x1b3.;
+Comment:十六进制浮点数指数缺位
+double,8
+ID, 6
+=,-
+17,19 ERROR  :exponent has no digits:	0x.Fap;
+Comment:正确的八进制数
+int,16
+ID, 7
+=,-
+NUM, 2
+;,-
+Comment:非法的八进制数
+int,16
+ID, 8
+=,-
+21,16 ERROR  :invalid digit in octal constant:	009
+Comment:合法的十进制浮点数
+double,8
+ID, 9
+=,-
+NUM, 3
+;,-
+Comment:合法的十进制整数
+int,16
+ID, 10
+=,-
+NUM, 4
+;,-
+Comment:合法的十进制浮点数
+int,16
+ID, 11
+=,-
+NUM, 5
+;,-
+Comment:合法的十进制带指数浮点数
+double,8
+ID, 12
+=,-
+NUM, 6
+;,-
+Comment:十进制浮点数指数缺位
+double,8
+ID, 13
+=,-
+31,19 ERROR  :exponent has no digits:	9.123e;
+double,8
+ID, 14
+=,-
+NUM, 7
+,,-
+ID, 15
+=,-
+NUM, 8
+;,-
+ID, 14
++=,-
+ID, 1
+>>,-
+NUM, 9
+;,-
+ID, 15
+&=,-
+(,-
+NUM, 10
+^,-
+NUM, 10
+),-
+?,-
+ID, 7
+:,-
+ID, 10
+;,-
+ID, 16
+ID, 17
+=,-
+STR, 0
+ID, 18
+=,-
+STR, 1
+;,-
+if,15
+(,-
+ID, 18
+==,-
+STR, 2
+),-
+{,-
+for,13
+(,-
+int,16
+ID, 10
+=,-
+NUM, 4
+;,-
+ID, 10
+<,-
+NUM, 11
+;,-
+ID, 10
+++,-
+),-
+ID, 19
+<<,-
+NUM, 12
 ;,-
 },-
-ID TABLE: 5
+ID, 16
+ID, 20
+=,-
+STR, 3
+;,-
+ID, 16
+ID, 21
+=,-
+43,20 ERROR  :missing terminating " character:	this is a 
+ID, 22
+ID, 16
+44,38 ERROR  :missing terminating " character:	;
+},-
+46:illegal end!
+
+ ------Tables------
+
+ID TABLE: 23
 0	main
-1	ad
-2	cout
-3	setw
-4	endl
-NUM TABLE: 10
-0	0x12399
-1	0x123.acbp99
-2	0123
-3	0123.234
-4	123.E-1123
-5	1234
-6	4
-7	5678
-8	12345
-9	67890
+1	a
+2	aa
+3	b
+4	c
+5	d
+6	e
+7	f
+8	g
+9	h
+10	i
+11	j
+12	k
+13	l
+14	m
+15	n
+16	string
+17	o
+18	p
+19	cout
+20	q
+21	r
+22	error
+
+NUM TABLE: 13
+0	0x.Fap-10
+1	0x3.Fap+10
+2	0071
+3	012.34
+4	0
+5	.123
+6	9.123E-999
+7	7
+8	15
+9	11
+10	1
+11	3
+12	6
+
 STR TABLE: 4
-0	\
-1	
-2	?
-3	
-Num of rows:  18
+0	i'm 	 a "lex" 
+
+1	\x72
+2	r
+3	this is 
+ a correct string
+
+
+ ------Tables End------
+
+Num of rows:  45

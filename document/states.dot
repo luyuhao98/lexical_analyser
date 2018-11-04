@@ -1,26 +1,174 @@
 digraph finite_state_machine {
-    rankdir = LR;
-    size = "8,5"
+    rankdir =LR;
+    size = "50,10"
      
     node [shape = doublecircle]; 
      
-    LR_0 LR_3 LR_4 LR_8;
-     
+    S0;
+   
+   e1[
+    label = "<f0> E1 | stray in program"
+    shape="record"
+   ]
+   e2[
+    label = "<f0> E2 | invalid num"
+    shape="record"
+   ]
+   e3[
+    label = "<f0> E3 | expected unqualified-id before numeric constant"
+    shape="record"
+   ]
+   e4[
+    label = "<f0> E4 | no digits in hexadecimal floating constant "
+    shape="record"
+   ]
+   e5[
+    label = "<f0> E5 | hexadecimal floating constants require an exponent"
+    shape="record"
+   ]
+   e6[
+    label = "<f> E6 | exponent has no digits"
+    shape="record"
+   ]
+   e7[
+    label = "<f> E7 |invalid digit in octal constant "
+    shape="record"
+   ]
+   e8[
+    label = "<f> E8 | illegal char!"
+    shape="record"
+   ]
+   e9[
+    label = "<f> E9 | missing terminating \" character"
+    shape="record"
+   ]
+   
    node [shape = circle];
-    
-   LR_0 -> LR_2 [ label = "SS(B)" ];
-   LR_0 -> LR_1 [ label = "SS(S)" ];
-   LR_1 -> LR_3 [ label = "S($end)" ];
-   LR_2 -> LR_6 [ label = "SS(b)" ];
-   LR_2 -> LR_5 [ label = "SS(a)" ];
-   LR_2 -> LR_4 [ label = "S(A)" ];
-   LR_5 -> LR_7 [ label = "S(b)" ];
-   LR_5 -> LR_5 [ label = "S(a)" ];
-   LR_6 -> LR_6 [ label = "S(b)" ];
-   LR_6 -> LR_5 [ label = "S(a)" ];
-   LR_7 -> LR_8 [ label = "S(b)" ];
-   LR_7 -> LR_5 [ label = "S(a)" ];
-   LR_8 -> LR_6 [ label = "S(b)" ];
-   LR_8 -> LR_5 [ label = "S(a)" ];
+   S0 -> S1 [ label = "_ a-z A-Z" ];
+   S0 -> S2 [ label = "0" ];
+   S0 -> S11 [ label = "1-9" ];
+   S0 -> S16 [ label = "." ];
+   S0 -> S0 [ label = "+ & | - * % = ! ^ /= ~ \n? , ; ( ) [ ] { } <空格> \\t \\r \\n :" ];
+   S0 -> S17 [ label = "//" ];
+   S0 -> S18 [ label = "/*" ];
+   S0 -> S20 [ label = "> <" ];
+   S0 -> S22 [ label = "\'" ];
+   S0 -> S27 [ label = "\""; ];
+   S0 -> e1:f [ label = "OTHERS" ];e1:f->S0;
+   
+   S1 -> S1 [ label = "_ a-z A-Z 0-9" ];
+   S1 -> S0 [ label = "OTHERS" ];
+   
+   S2 -> S3 [ label = "x(X)" ];
+   S2 -> S10 [ label = "0-7" ];
+   S2 -> S12 [ label = "." ];
+   S2 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;  
+   S2 -> S0 [ label = "OTHERS" ];
+   
+   S3 -> S4 [ label = "0-9 a-f A-F" ];
+   S3 -> S5 [ label = "." ];
+   S3 -> e2:f [ label = "OTHERS" ];e2:f->S0;
+   
+   S4 -> S4 [ label = "0-9 a-f A-F" ];
+   S4 -> S6 [ label = "." ];
+   S4 -> S7 [ label = "p(P)" ];
+   S4 -> e3:f [ label = "_ g-z G-Z" ];e3:f->S0;
+   S4 -> S0 [ label = "OTHERS" ];
+   
+   S5 -> S6 [ label = "0-9 a-f A-F" ];
+   S5 -> e3:f [ label = "_ g-o q-z G-O Q-Z" ];e3:f->S0;
+   S5 -> e4:f [ label = "OTHERS" ];e4:f->S0;
+   
+   S6 -> S6 [ label = "0-9 a-f A-F" ];
+   S6 -> S7 [ label = "p(P)" ];
+   S6 -> e3:f [ label = "_ g-o q-z G-O Q-Z" ];e3:f->S0;
+   S6 -> e5:f [ label = "OTHERS" ];e5:f->S0;
+   
+   S7 -> S8  [ label = "0-9" ];
+   S7 -> S9 [ label = "- +" ];
+   S7 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S7 -> e6:f [ label = "OTHERS" ];e6:f->S0;
+   
+   S8 -> S8 [ label = "0-9" ];
+   S8 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S8 -> S0 [ label = "OTHERS" ];
+   
+   S9 -> S8 [ label = "0-9" ];
+   S9 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S9 -> e6:f [ label = "OTHERS" ];e6:f->S0;
+
+   S10 -> S10 [ label = "0-7" ];
+   S10 -> S12 [ label = "." ];
+   S10 -> S13 [ label = "e(E)" ];
+   S10 -> e7:f [ label = "8 9" ];e7:f->S0;
+   S10 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S10 -> S0 [ label = "OTHERS" ];  
+   
+   S11 -> S11 [ label = "0-9" ];  
+   S11 -> S12 [ label = "." ];  
+   S11 -> S13 [ label = "e(E)" ];  
+   S11 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S11 -> S0 [ label = "OTHERS" ];  
+   
+   S12 -> S12 [ label = "0-9" ];
+   S12 -> S13 [ label = "e(E)" ];
+   S12 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S12 -> S0 [ label = "OTHERS" ];  
+   
+   S13 -> S14 [ label = "0-9" ];
+   S13 -> S15 [ label = "+ -" ];
+   S13 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S13 -> e6:f [ label = "OTHERS" ];e6:f->S0;
+   
+   S14 -> S14 [ label = "0-9" ];   
+   S14 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S14 -> S0 [ label = "OTHERS" ];
+  
+   S15 -> S14 [ label = "0-9" ];
+   S15 -> e3:f [ label = "_ a-z A-Z" ];e3:f->S0;
+   S15 -> e6:f [ label = "OTHERS" ];e6:f->S0;
+   
+   S16 -> S12 [ label = "0-9" ];
+   S16 -> S0 [ label = "OTHERS" ];
+
+   S17 -> S0 [ label = "\\r \\n" ];
+   S17 -> S17 [ label = "OTHERS" ];
+   
+   S18 -> S19 [ label = "*" ];
+   S18 -> S18 [ label = "OTHERS" ];
+
+   S19 -> S0 [ label = "/" ];
+   S19 -> S18 [ label = "OTHERS" ];
+   
+   S20 -> S21 [ label = "str[0]" ];
+   S20 -> S0 [ label = "OTHERS" ];
+   
+   S21 -> S0 [ label = "" ];
+   
+   S22 -> S23 [ label = "\\" ];
+   S22 -> S24 [ label = "OTHERS" ];
+   
+   S23 -> S24 [ label = "a b f n r t v \\ \' \" \?" ];
+   S23 -> S25 [ label = "x(X)" ];
+   S23 -> e8:f [ label = "OTHERS" ];e8:f->S0;
+
+
+   S24-> S0 [ label = "\'" ];
+   S24 -> e8:f [ label = "OTHERS" ];e8:f->S0;
+
+   S25 -> S26 [ label = "0-9 a-f A-F" ];
+   S25 -> e8:f [ label = "OTHERS" ];e8:f->S0;
+
+   S26 -> S24 [ label = "0-9 a-f A-F" ];
+   S26-> S0 [ label = "\'" ];
+   S26 -> e8:f [ label = "OTHERS" ];e8:f->S0;
+
+   S27 -> S28 [ label = "\\" ];
+   S27 -> S0 [ label = "\"" ];
+   S27 -> e9:f [ label = "\\r \\n" ];e9:f->S0;
+   S27 -> S27 [ label = "OTHERS" ];
+   
+   S28 -> S27 [ label = "a b f n r t v \\ \' \" \?" ];
+   S28 -> e8:f [ label = "OTHERS" ];e8:f->S0;
 }
 

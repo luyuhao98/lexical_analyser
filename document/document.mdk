@@ -6,7 +6,7 @@ Package : [UTF8]ctex
 [TITLE]
 [TOC]
 
-#Ｃ语言词法分析规范
+#Ｃ语言词法分析规范{#C}
 ## 语言说明
 
 ### 保留字
@@ -44,10 +44,11 @@ unsigned void volatile while auto
 1. 十进制整数，如：`0,123`
 2. 十进制浮点数，如： `.1, 0., 1.234` 
 3. 十进制指数，如： `12E-19, .33E10`
-4. 八进制整数， 如：`073 0000012`
+4. 八进制整数， 如：`073 0000012`\
   (_根据C99，不支持八进制浮点及指数，若有均视为十进制_)
-5. 十六进制整数，`0xA, 0x2Ef,`
-6. 十六进制浮点数，`0x.3p-9, 0xF.p100`\n
+5. 十六进制整数，`0xA, 0x2Ef,`\
+  (_根据C99，十六进制大小写均可识别_)
+6. 十六进制浮点数，`0x.3p-9, 0xF.p100`\
     (_根据C99，十六进制浮点数必须带指数, 且指数符号为p(P)_)
 
 字符串（及字符）:
@@ -72,7 +73,7 @@ unsigned void volatile while auto
 4. 检查源程序中存在的词法错误，并报告错误所在的位置
 5. 对源程序中出现的错误进行适当的恢复，使词法分析可以继续进行，对源程序进行一次扫描，即可检查并报告源程序中存在的所有词法错误。
 
-## 完成与改进
+## 完成与改进{#wc}
 完全满足了实验需求，并做出了一些改进：
 
 1. 除字符串中八进制转义字符形式外，支持C99所有的词法分析。
@@ -129,33 +130,337 @@ outopt()
 state
  ~int, 代表当前状态
 ## 状态转移图
-digraph finite_state_machine {
-    rankdir = LR;
-    size = "8,5"
-     
-    node [shape = doublecircle]; 
-     
-    LR_0 LR_3 LR_4 LR_8;
-     
-   node [shape = circle];
-    
-   LR_0 -> LR_2 [ label = "SS(B)" ];
-   LR_0 -> LR_1 [ label = "SS(S)" ];
-   LR_1 -> LR_3 [ label = "S($end)" ];
-   LR_2 -> LR_6 [ label = "SS(b)" ];
-   LR_2 -> LR_5 [ label = "SS(a)" ];
-   LR_2 -> LR_4 [ label = "S(A)" ];
-   LR_5 -> LR_7 [ label = "S(b)" ];
-   LR_5 -> LR_5 [ label = "S(a)" ];
-   LR_6 -> LR_6 [ label = "S(b)" ];
-   LR_6 -> LR_5 [ label = "S(a)" ];
-   LR_7 -> LR_8 [ label = "S(b)" ];
-   LR_7 -> LR_5 [ label = "S(a)" ];
-   LR_8 -> LR_6 [ label = "S(b)" ];
-   LR_8 -> LR_5 [ label = "S(a)" ];
-}
+
+本状态转移图[#states]共有0-28个状态，外加9个报错状态，共38个状态，涵盖了[C语言词法分析规范][#C]中的所有情况
+
+
+~ Figure { #states; caption: "状态转移图" }
+![state]
+~
+[state]: state.svg "state" { width:auto; max-width:90% }
+## 报错状态汇总
+E1: stray in program
+ ~字符不属于识别范围
+E2: invalid num
+ ~非法数字，如0x 
+E3: expected unqualified-id before numeric constant
+ ~数字开头的变量，如 1kj 0x12
+E4: no digits in hexadecimal floating constant
+ ~十六进制浮点数没有位数，如 0x.
+E5: hexadecimal floating constants require an exponent
+ ~ 十六进制浮点数需要指数，如 0x1123.
+E6: exponent has no digits
+ ~ 十六进制浮点数指数缺少位数 如0xA.Fp-
+E7: invalid digit in octal constant
+ ~ 八进制无效位 如 00012389
+E8: illegal char!
+ ~ 非法字符
+E9: missing terminating \" character
+ ~ 缺少双引号结尾
+
+**E10**: illegal end! (_ 此检测环节位于主循环结束后_)
+ ~ 特别的，在缓冲区读完后，如果正常结尾，当前检测串str应该为空，若不为空，一定为非法结尾。
+
+
+
+
+#程序及执行
+
+## 相关文件
+* lex.cpp : 词法分析程序代码
+* lex : linux 环境下g++ 7.3.0 编译后的执行程序
+* lex.exe : Win10 环境下vs2017 编译后的执行程序
+* input.txt: 词法分析输入，即源程序。
+* output.txt: 词法分析输出。
+* text.cpp : `<相关头文件>+<input.txt> ` 用g++ 7.3.0进行测试
+
+## 测试 
+### 测试输入
+**注意：输入为程序部分，不包括预编译部分(不属于lex的任务)**
+
+```cpp
+/*input.txt*/
+int main()
+{
+        double 0_p balabala; 
+        /*  非法符号0_p,
+        报错且跳过balabala进入下一行  */
+        
+        double a = 0x.Fap-10; //符号+正确的十六进制浮点数
+
+        //保留字 + 正确的十六进制浮点数 
+        auto aa = 0x3.Fap+10; 
+        //非法数字
+        double b = 0x; 
+        //缺位的十六进制浮点数
+        double c = 0x.; 
+        //十六进制浮点数缺少指数
+        double d = 0x1b3.; 
+        //十六进制浮点数指数缺位
+        double e = 0x.Fap; 
+        //正确的八进制数
+        int f = 0071; 
+        //非法的八进制数
+        int g = 0091; 
+        //合法的十进制浮点数
+        double h= 012.34; 
+        //合法的十进制整数
+        int i = 0; 
+        //合法的十进制浮点数
+        int j = .123; 
+        //合法的十进制带指数浮点数
+        double k = 9.123E-999; 
+        //十进制浮点数指数缺位
+        double l = 9.123e; 
+
+        int m= 7 , n = 15;
+        m +=  a >> 11;
+        n &= (1^1) ? f : i ;
+        string o = "i\'m \t a \"lex\" \n"  
+        char p = '\x72';
+        if (p == 'r'){
+                for (int i = 0 ; i<3;i++)
+                cout<<6;
+        }
+        string q = "this is \n a correct string" ;
+        string r = "this is a 
+                        error string ";
+        
+}/* this is an il leg al en d
+
+```
+### 测试输出
+
+为了演示效果，报错与注释均输出到output.txt 中,输出顺序为\
+`[记号二元式]/[报错]/[注释] \n [符号表]+[符号总数] \n[数字表]+[数字总数]\n[字符串表]+[字符串总数]\n 总行数`\
+各部分具体格式见[完成与改进部分][#wc];
+
+```cpp
+/*output.txt*/
+int,16
+ID, 0
+(,-
+),-
+{,-
+double,8
+3,15 ERROR  :expected unqualified-id before numeric constant:	0_
+Comment:  非法符号0_p,
+        报错且跳过balabala进入下一行  
+double,8
+ID, 1
+=,-
+NUM, 0
+;,-
+Comment:符号+正确的十六进制浮点数
+Comment:保留字 + 正确的十六进制浮点数 
+auto,0
+ID, 2
+=,-
+NUM, 1
+;,-
+Comment:非法数字
+double,8
+ID, 3
+=,-
+11,19 ERROR  :no digits in hexadecimal floating constant:	0x; 
+Comment:缺位的十六进制浮点数
+double,8
+ID, 4
+=,-
+13,19 ERROR  :no digits in hexadecimal floating constant:	0x.;
+Comment:十六进制浮点数缺少指数
+double,8
+ID, 5
+=,-
+15,19 ERROR  :hexadecimal floating constants require an exponent:	0x1b3.;
+Comment:十六进制浮点数指数缺位
+double,8
+ID, 6
+=,-
+17,19 ERROR  :exponent has no digits:	0x.Fap;
+Comment:正确的八进制数
+int,16
+ID, 7
+=,-
+NUM, 2
+;,-
+Comment:非法的八进制数
+int,16
+ID, 8
+=,-
+21,16 ERROR  :invalid digit in octal constant:	009
+Comment:合法的十进制浮点数
+double,8
+ID, 9
+=,-
+NUM, 3
+;,-
+Comment:合法的十进制整数
+int,16
+ID, 10
+=,-
+NUM, 4
+;,-
+Comment:合法的十进制浮点数
+int,16
+ID, 11
+=,-
+NUM, 5
+;,-
+Comment:合法的十进制带指数浮点数
+double,8
+ID, 12
+=,-
+NUM, 6
+;,-
+Comment:十进制浮点数指数缺位
+double,8
+ID, 13
+=,-
+31,19 ERROR  :exponent has no digits:	9.123e;
+double,8
+ID, 14
+=,-
+NUM, 7
+,,-
+ID, 15
+=,-
+NUM, 8
+;,-
+ID, 14
++=,-
+ID, 1
+>>,-
+NUM, 9
+;,-
+ID, 15
+&=,-
+(,-
+NUM, 10
+^,-
+NUM, 10
+),-
+?,-
+ID, 7
+:,-
+ID, 10
+;,-
+ID, 16
+ID, 17
+=,-
+STR, 0
+ID, 18
+=,-
+STR, 1
+;,-
+if,15
+(,-
+ID, 18
+==,-
+STR, 2
+),-
+{,-
+for,13
+(,-
+int,16
+ID, 10
+=,-
+NUM, 4
+;,-
+ID, 10
+<,-
+NUM, 11
+;,-
+ID, 10
+++,-
+),-
+ID, 19
+<<,-
+NUM, 12
+;,-
+},-
+ID, 16
+ID, 20
+=,-
+STR, 3
+;,-
+ID, 16
+ID, 21
+=,-
+43,20 ERROR  :missing terminating " character:	this is a 
+ID, 22
+ID, 16
+44,38 ERROR  :missing terminating " character:	;
+},-
+46:illegal end!
+
+ ------Tables------
+
+ID TABLE: 23
+0	main
+1	a
+2	aa
+3	b
+4	c
+5	d
+6	e
+7	f
+8	g
+9	h
+10	i
+11	j
+12	k
+13	l
+14	m
+15	n
+16	string
+17	o
+18	p
+19	cout
+20	q
+21	r
+22	error
+
+NUM TABLE: 13
+0	0x.Fap-10
+1	0x3.Fap+10
+2	0071
+3	012.34
+4	0
+5	.123
+6	9.123E-999
+7	7
+8	15
+9	11
+10	1
+11	3
+12	6
+
+STR TABLE: 4
+0	i'm 	 a "lex" 
+
+1	\x72
+2	r
+3	this is 
+ a correct string
+
+
+ ------Tables End------
+
+Num of rows:  45
+
+```
+### g++ 7.3.0 编译结果
+text.cpp 为 input.txt代码部分+相关头文件。[编译结果][#g]与注释中预测的基本一致。
+
+~Figure{#g; caption: "g++ 7.3.0 编译结果" }
+![g]
+~
+[g]: g++.png "g++"{ width:auto; max-width:90% }
 
 ## 代码
+
+
 ```cpp
 #include <iostream>
 #include <vector>
@@ -880,9 +1185,12 @@ int main()
         o << "Num of rows:  " << row << endl;
         
 }
-
 ```
 
-#测试
-## 输入
-## 输出
+# 总结
+经过本次实验，我有许多收获
+
+1. 加深了对词法分析的理解
+2. 学习了更多的有关C语言的标准，历史，C的编译器方面的知识，对C语言及其编译理解的更为深入
+3. 提高了自己的编程技能，运用了许多C++的标准库，极大地提高了我的编程效率
+4. 提高了自己撰写文档的能力。其中用到的工具[madoko](https://www.madoko.net/)与[graphviz](http://www.graphviz.org/)方便了我的排版，\ 提高了撰写文档的效率，\ 增添了格调。

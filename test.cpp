@@ -1,49 +1,50 @@
 #include<string>
 #include<iostream>
-#include<vector>
-#include<algorithm>
-#include <sstream>  
-#include<iomanip>
 using namespace std;
-
-vector<string> sss;
 int main()
-{      
+{
+        double 0_p balabala; 
+        /*  非法符号0_p,
+        报错且跳过balabala进入下一行  */
+        
+        double a = 0x.Fap-10; //符号+正确的十六进制浮点数
 
-//        sss.push_back("111");
-//        sss.push_back("222");
-//        sss.push_back("333");
-//        sss.push_back("$444");
+        //保留字 + 正确的十六进制浮点数 
+        auto aa = 0x3.Fap+10; 
+        //非法数字
+        double b = 0x; 
+        //缺位的十六进制浮点数
+        double c = 0x.; 
+        //十六进制浮点数缺少指数
+        double d = 0x1b3.; 
+        //十六进制浮点数指数缺位
+        double e = 0x.Fap; 
+        //正确的八进制数
+        int f = 0071; 
+        //非法的八进制数
+        int g = 0091; 
+        //合法的十进制浮点数
+        double h= 012.34; 
+        //合法的十进制整数
+        int i = 0; 
+        //合法的十进制浮点数
+        int j = .123; 
+        //合法的十进制带指数浮点数
+        double k = 9.123E-999; 
+        //十进制浮点数指数缺位
+        double l = 9.123e; 
 
-//        vector <string>::iterator sywalker= sss.begin();
-//        while(sywalker!=sss.end())
-//        {
-//                 cout<<*sywalker<<endl;
-//                 sywalker++;
-//        }
-//        vector <string>::iterator index1 = find(sss.begin(),sss.end(),"111");
-//        cout<<index1-sss.begin();
-
-//        vector <string>::iterator index2 = find(sss.begin(),sss.end(),"$444");
-//        cout<<index2-sss.begin();
-       
-
-//        vector <string>::iterator index3 = find(sss.begin(),sss.end(),"xxx");
-//        cout<<index3-sss.begin();
-// int i = 000000000071;
-// int j = 0x00000A;
-// int k = 111;
-
-float i =0x4.p5;
-// string sti = "0000000071.4";
-// stringstream stream;
-// //stream<<hexfloat<<sti;
-// //stream>>i;
-// stream>>i;
-// j=strtoul(sti.c_str(),nullptr,8);
-
-qqqq
-// cout<<str<<endl;
-//12312321321321
-cout<<i<<endl;
-}
+        int m= 7 , n = 15;
+        m +=  a >> 11;
+        n &= (1^1) ? f : i ;
+        string o = "i\'m \t a \"lex\" \n"  
+        char p = '\x72';
+        if (p == 'r'){
+                for (int i = 0 ; i<3;i++)
+                cout<<6;
+        }
+        string q = "this is \n a correct string" ;
+        string r = "this is a 
+                        error string ";
+        
+}/* this is an il leg al en d

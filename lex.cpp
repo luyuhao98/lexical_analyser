@@ -132,6 +132,7 @@ void outtable(tables t)
         {       
                 o << walker - table->begin()<<'\t'<< *walker  << endl;
         }
+        o<<endl;
 }
 
 void outerror(const char *error)
@@ -313,6 +314,11 @@ int main()
                         {
                                 state = 12;
                         }
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
+                                outerror("expected unqualified-id before numeric constant");
+                                state = 0;
+                        }
+                        
                         /*此外，只要加'.' 无论后面是否跟数字or指数都视为浮点数。如0xA. 报错：十六进制浮点数必须带指数*/
                         else
                         {
@@ -349,7 +355,7 @@ int main()
                         else if(in == 'p'|| in =='P'){
                                 state = 7; //0xAbcp
                         }
-                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='-'){
+                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -365,7 +371,7 @@ int main()
                         {
                                 state = 6; //0x.B
                         }
-                        else if((in >='g'&&in<='z'&&in!='p')||(in>='G'&&in<='Z'&&in!='P')||in =='-'){
+                        else if((in >='g'&&in<='z'&&in!='p')||(in>='G'&&in<='Z'&&in!='P')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -384,7 +390,7 @@ int main()
                         {
                                 state = 7; //0xA2.F23p
                         }
-                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='-'){
+                        else if((in >='g'&&in<='z')||(in>='G'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -404,7 +410,7 @@ int main()
                         {
                                 state = 9; //0xA2.23p-
                         }
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -419,7 +425,7 @@ int main()
                         {
                                 state = 8; //0xA2.23p123 or //0xA2.23p-123
                         }
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -435,7 +441,7 @@ int main()
                         {
                                 state = 8; //0xA2.23p-1
                         }
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -462,7 +468,7 @@ int main()
                                 outerror("invalid digit in octal constant");
                                 state = 0;
                         }   
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -480,7 +486,7 @@ int main()
                                 state = 12; //1234.
                         else if (in == 'e'|| in == 'E')
                                 state = 13;////123e
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -496,7 +502,7 @@ int main()
                                 state = 12; //123.456
                         else if (in == 'e' || in == 'E')
                                 state = 13; //123.456e
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -512,7 +518,7 @@ int main()
                                 state = 14; //123.456e7
                         else if (in == '-' || in == '+')
                                 state = 15; //123.456e-
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -525,7 +531,7 @@ int main()
                 case 14: //123.456e7 or 123.456e-7
                         if (in >= '0' && in <= '9')
                                 state = 14; //123.456e789 or 123.456e-789
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -539,7 +545,7 @@ int main()
                 case 15: //123.456e-
                         if (in >= '0' && in <= '9')
                                 state = 14; //123.456e-7
-                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='-'){
+                        else if((in >='a'&&in<='z')||(in>='A'&&in<='Z')||in =='_'){
                                 outerror("expected unqualified-id before numeric constant");
                                 state = 0;
                         }
@@ -631,7 +637,9 @@ int main()
                                 case '\?' : tra='\?';str.pop_back();str.pop_back();str.push_back(tra);state =24;break;
                                                 
                                 case 'x':// \x
+                                case 'X':
                                         state = 25;
+                                        break;
                                 default:
                                         outerror("illegal char!");
                                         state =0;
@@ -666,6 +674,7 @@ int main()
                         // \xa'  
                                 str.pop_back(); // \xa
                                 intable(STR);
+                                state = 0;
                         }
                         else {
                                 outerror("illegal char!");
@@ -715,9 +724,12 @@ int main()
                 o << row << ":" << "illegal end!" << endl;
         }
         row--;//平衡开始增添的\n
+        o<<"\n ------Tables------\n"<<endl;
         outtable(ID);
         outtable(NUM);
         outtable(STR);
+        o<<"\n ------Tables End------\n"<<endl;
+        
         o << "Num of rows:  " << row << endl;
         
 }
